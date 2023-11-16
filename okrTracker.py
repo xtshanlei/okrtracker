@@ -13,7 +13,6 @@ df = conn.read("supervisiontracker/config.yaml", input_format = 'text',ttl=600)
 
 # Load configuration from the YAML file
 config = yaml.load(df, Loader=SafeLoader)
-st.write(config)
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
     st.session_state.okr_data = pd.DataFrame(columns=["Username", "Week Start", "Objectives", "Key Results", "Last Week's Plans", "Progress", "Next Week's Plans"])
