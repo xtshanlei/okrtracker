@@ -12,8 +12,7 @@ df = conn.read("supervisiontracker/config.yaml", input_format = 'text',ttl=600)
 
 
 # Load configuration from the YAML file
-with open(df) as file:
-    config = yaml.load(file, Loader=SafeLoader)
+config = yaml.load(df, Loader=SafeLoader)
 st.write(config)
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
