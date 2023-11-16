@@ -4,6 +4,22 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 from st_files_connection import FilesConnection
+import boto3
+from io import StringIO
+
+def upload_df_to_s3(df, bucket, file_name):
+    # Convert DataFrame to a CSV string
+    csv_buffer = StringIO()
+    df.to_csv(csv_buffer, index=False)
+
+    # Reset the pointer of the buffer to the beginning
+    csv_buffer.seek(0)
+
+    # Create an S3 client
+    s3_client = boto3.client('s3')
+
+    # Upload the CSV string directly to S3
+    s3_client.put_object(Bucket=bucket, Key=file_name, Body=csv_buffer.getvalue())
 
 # Create connection object and retrieve file contents.
 # Specify input format is a csv and to cache the result for 600 seconds.
@@ -45,6 +61,7 @@ if authentication_status:
             selected_record = st.selectbox("Select a record to remove", st.session_state.okr_data.index)
             if st.button("Remove Record"):
                 st.session_state.okr_data = st.session_state.okr_data.drop(selected_record)
+                upload_df_to_s3(st.session_state.okr_data, 'supervisiontracker', 'okr.csv')
                 st.success("Record removed successfully")
                 st.write(st.session_state.okr_data)
     else:
@@ -63,6 +80,7 @@ if authentication_status:
             if submitted:
                 new_data = pd.DataFrame([{"Username": username, "Week Start": week_start, "Objectives": objectives, "Key Results": key_results, "Last Week's Plans": last_week_plans, "Progress": progress, "Next Week's Plans": next_week_plans}])
                 st.session_state.okr_data = pd.concat([st.session_state.okr_data, new_data], ignore_index=True)
+                upload_df_to_s3(st.session_state.okr_data, 'supervisiontracker', 'okr.csv')
                 st.success("OKR Added Successfully")
 
         # Display OKR data specific to the logged-in user
