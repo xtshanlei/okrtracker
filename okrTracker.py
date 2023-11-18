@@ -20,6 +20,7 @@ def upload_df_to_s3(df, bucket, file_name):
 
     # Upload the CSV string directly to S3
     s3_client.put_object(Bucket=bucket, Key=file_name, Body=csv_buffer.getvalue())
+    st.success('Upload to S3 successfully')
 
 # Create connection object and retrieve file contents.
 # Specify input format is a csv and to cache the result for 600 seconds.
