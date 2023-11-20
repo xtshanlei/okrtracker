@@ -39,11 +39,11 @@ def read_csv_from_s3(bucket, file_name):
 # Specify input format is a csv and to cache the result for 600 seconds.
 conn = st.connection('s3', type=FilesConnection)
 config_read = conn.read("supervisiontracker/config.yaml", input_format = 'text')
-st.write(config_read)
+
 
 # Load configuration from the YAML file
 config = yaml.load(config_read, Loader=SafeLoader)
-st.write(config)
+
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
     st.session_state.okr_data = read_csv_from_s3('supervisiontracker', 'okr.csv')
