@@ -23,7 +23,7 @@ def upload_df_to_s3(df, bucket, file_name):
     st.success('Upload to S3 successfully')
 
 # Function to read a file from S3
-def read_file_from_s3(bucket, file_name):
+def read_csv_from_s3(bucket, file_name):
     s3_client = boto3.client('s3')
     response = s3_client.get_object(Bucket=bucket, Key=file_name)
     status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
