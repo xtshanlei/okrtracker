@@ -39,7 +39,7 @@ def read_csv_from_s3(bucket, file_name):
 # Specify input format is a csv and to cache the result for 600 seconds.
 conn = st.connection('s3', type=FilesConnection)
 config_read = conn.read("supervisiontracker/secrets.yaml", input_format = 'text',ttl=10)
-
+st.write(config_read)
 
 # Load configuration from the YAML file
 config = yaml.load(config_read, Loader=SafeLoader)
