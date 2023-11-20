@@ -26,17 +26,23 @@ def upload_df_to_s3(df, bucket, file_name):
 def read_file_from_s3(bucket, file_name):
     s3_client = boto3.client('s3')
     response = s3_client.get_object(Bucket=bucket, Key=file_name)
-    return response['Body'].read().decode('utf-8')
+    status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+    if status == 200:
+        df = pd.read_csv(response.get("Body"))
+        return df
+    else:
+        st.error("Failed to retrieve file from S3")
+        return pd.DataFrame()  # Return an empty DataFrame i
 
 
 # Create connection object and retrieve file contents.
 # Specify input format is a csv and to cache the result for 600 seconds.
 conn = st.connection('s3', type=FilesConnection)
-df = conn.read("supervisiontracker/config.yaml", input_format = 'text',ttl=600)
+config_read = conn.read("supervisiontracker/config.yaml", input_format = 'text',ttl=600)
 
 
 # Load configuration from the YAML file
-config = yaml.load(df, Loader=SafeLoader)
+config = yaml.load(config_read, Loader=SafeLoader)
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
     st.session_state.okr_data = pd.read_csv(read_file_from_s3('supervisiontracker', 'okr.csv'), encoding='utf-8')
