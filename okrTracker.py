@@ -43,6 +43,7 @@ config_read = conn.read("supervisiontracker/config.yaml", input_format = 'text',
 
 # Load configuration from the YAML file
 config = yaml.load(config_read, Loader=SafeLoader)
+st.write(config)
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
     st.session_state.okr_data = read_csv_from_s3('supervisiontracker', 'okr.csv')
