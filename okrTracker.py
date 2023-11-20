@@ -22,6 +22,13 @@ def upload_df_to_s3(df, bucket, file_name):
     s3_client.put_object(Bucket=bucket, Key=file_name, Body=csv_buffer.getvalue())
     st.success('Upload to S3 successfully')
 
+# Function to read a file from S3
+def read_file_from_s3(bucket, file_name):
+    s3_client = boto3.client('s3')
+    response = s3_client.get_object(Bucket=bucket, Key=file_name)
+    return response['Body'].read().decode('utf-8')
+
+
 # Create connection object and retrieve file contents.
 # Specify input format is a csv and to cache the result for 600 seconds.
 conn = st.connection('s3', type=FilesConnection)
@@ -32,7 +39,7 @@ df = conn.read("supervisiontracker/config.yaml", input_format = 'text',ttl=600)
 config = yaml.load(df, Loader=SafeLoader)
 # Initialize session state for data
 if 'okr_data' not in st.session_state:
-    st.session_state.okr_data = pd.DataFrame(columns=["Username", "Week Start", "Objectives", "Key Results", "Last Week's Plans", "Progress", "Next Week's Plans"])
+    st.session_state.okr_data = pd.read_csv(read_file_from_s3('supervisiontracker', 'okr.csv'), encoding='utf-8')
 
 # Initialize the authenticator
 authenticator = stauth.Authenticate(
